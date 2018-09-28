@@ -127,16 +127,5 @@ class TestAPIClient(unittest.TestCase):
         self.assertEqual(self.client.a.b._name, "http://localhost:8000/a/b")
 
 
-def test_async_request():
-    client = APIClient('http://localhost:8000')
-    headers = {'Authorization': 'Bearer 2808555096_d09e0cdca8fc4af88e7cc47ed055e6f2'}
-    data = {'title': '智勇测试client', 'content': 'xxxxxxx'}
-    result = client.wechat_service.help_list.post(headers=headers, data=data, is_async=True)
-    logger.debug(result)
-
-
 if __name__ == '__main__':
-    # celery -A client:app worker
-    # celery flower -A client:app --broker=redis://localhost:6379/0 --port=5555
-    # unittest.main()
-    test_async_request()
+    unittest.main()
