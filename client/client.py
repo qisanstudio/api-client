@@ -3,14 +3,14 @@
 import requests
 import unittest
 from celery import Celery
-from logformat import get_color_console_logger
+from client.logformat import get_color_console_logger
 
 
-app = Celery('client', broker='redis://localhost:6379')
+celery_app = Celery('client', broker='redis://localhost:6379')
 logger = get_color_console_logger('client')
 
 
-@app.task
+@celery_app.task
 def _request(method, url, **kw):
     """
     COPY FROM https://github.com/requests/requests/blob/master/requests/sessions.py#L461
