@@ -2,6 +2,7 @@
 import click
 from subprocess import Popen
 from client.client import celery_app, logger, APIClient
+from client.esclient import ESAPIClient
 
 
 @click.group()
@@ -46,6 +47,29 @@ def test(async):
     data = {'title': '智勇测试client', 'content': 'xxxxxxx'}
     result = client.wechat_service.help_list.post(headers=headers, data=data, is_async=async)
     logger.debug(result)
+
+
+@cli.command()
+@click.option('--async', '-a', type=bool, help='is async or not')
+def es(async):
+    client = ESAPIClient('https://search-cia-ykxpgqrde45eke7u2vw72qh6c4.cn-northwest-1.es.amazonaws.com.cn')
+    data = {
+        "user": "zhiyong",
+        "post_date": "2018-11-15T14:12:12",
+        "message": "智勇的message"
+    }
+    result = client.dev_test._doc._post(json=data, is_async=async)
+    if async:
+        logger.debug(result)
+    else:
+        j = result.json()
+        if 'status' in j:
+            logger.warning(j['status'])
+        if 'error' in j:
+            for k, v in j['error'].items():
+                logger.error('%s - %s' % (k, v))
+        else:
+            logger.debug(j)
 
 
 if __name__ == '__main__':

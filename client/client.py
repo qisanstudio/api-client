@@ -105,10 +105,16 @@ class _Callable(object):
         self._name = name
 
     def __getattr__(self, item):
-        if item == 'get':
+        if item == '_get':
             return _Excutable(self._client, 'GET', self._name)
-        elif item == 'post':
+        elif item == '_post':
             return _Excutable(self._client, 'POST', self._name)
+        elif item == '_put':
+            # TODO no test
+            return _Excutable(self._client, 'PUT', self._name)
+        elif item == '_delete':
+            # TODO no test
+            return _Excutable(self._client, 'DELETE', self._name)
         name = '{}/{}'.format(self._name, item)
         return _Callable(self._client, name)
 
