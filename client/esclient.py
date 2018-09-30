@@ -15,7 +15,3 @@ class ESAPIClient(APIClient):
 
         kw['headers'] = headers
         return method, url, kw
-
-
-if __name__ == '__main__':
-    pass

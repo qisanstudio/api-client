@@ -50,26 +50,63 @@ def test(async):
 
 
 @cli.command()
-@click.option('--async', '-a', type=bool, help='is async or not')
+@click.option('--async', '-a', type=bool, default=False, help='is async or not')
 def es(async):
     client = ESAPIClient('https://search-cia-ykxpgqrde45eke7u2vw72qh6c4.cn-northwest-1.es.amazonaws.com.cn')
+
+    logger.info("insert data")
     data = {
         "user": "zhiyong",
         "post_date": "2018-11-15T14:12:12",
-        "message": "智勇的message"
+        "message": "智勇的message",
+        "as_dict": {
+            "title": "我是标题",
+            "conent": "我是内容"
+        }
     }
-    result = client.dev_test._doc._post(json=data, is_async=async)
-    if async:
-        logger.debug(result)
-    else:
-        j = result.json()
-        if 'status' in j:
-            logger.warning(j['status'])
-        if 'error' in j:
-            for k, v in j['error'].items():
-                logger.error('%s - %s' % (k, v))
-        else:
-            logger.debug(j)
+    # resp = client.dev_index.bnb_db_backup_type._post(json=data, is_async=async)
+    # logger.debug(resp.json())
+
+    logger.info("get index mapping")
+    resp = client.dev_index._mapping.bnb_db_backup_type._get(is_async=async)
+    logger.debug(resp.json())
+
+    logger.info("filter by post_data")
+    search_by_date_json = {
+                                "query": {
+                                    "range": {
+                                        "post_date": {
+                                            "gte": "2018-11-14T00:00:00",
+                                            "lte": "2018-11-15T15:00:00"
+                                        }
+                                    }
+                                }
+                            }
+    resp = client.dev_index.bnb_db_backup_type._search._post(json=search_by_date_json, is_async=async)
+    logger.debug(resp.json())
+
+    logger.info("filter by post_data and user_id")
+    search_by_date_json = {
+                              "query": {
+                                "bool": {
+                                  "must": {
+                                    "term": {
+                                      "user": "zhiyong"
+                                    }
+                                  },
+                                  "filter": {
+                                    "range": {
+                                      "post_date": {
+                                        "gte": "2018-11-14T00:00:00",
+                                        "lte": "2018-11-15T15:00:00"
+                                      }
+                                    }
+                                  }
+                                }
+                              }
+                            }
+    resp = client.dev_index.bnb_db_backup_type._search._post(json=search_by_date_json, is_async=async)
+    logger.debug(resp.json())
 
 
 if __name__ == '__main__':
